@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SentinelController {
 
-    @Reference
+    @Reference(timeout = 3000)
     SentinelService sentinelService;
 
     @GetMapping("/say")

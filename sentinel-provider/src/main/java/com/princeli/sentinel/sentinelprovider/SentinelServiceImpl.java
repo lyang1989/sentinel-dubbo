@@ -16,6 +16,11 @@ import java.time.LocalDateTime;
 public class SentinelServiceImpl implements SentinelService {
     @Override
     public String sayHello(String txt) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return "hello world:"+ LocalDateTime.now();
     }
 }

@@ -6,11 +6,15 @@ import com.alibaba.csp.sentinel.cluster.client.config.ClusterClientConfigManager
 import com.alibaba.csp.sentinel.datasource.ReadableDataSource;
 import com.alibaba.csp.sentinel.datasource.nacos.NacosDataSource;
 import com.alibaba.csp.sentinel.init.InitFunc;
+import com.alibaba.csp.sentinel.slots.block.RuleConstant;
+import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
+import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,8 +48,9 @@ public class DataSourceInitFunc implements InitFunc {
     @Override
     public void init() throws Exception {
         //加载集群信息
-        loadClusterClientConfig();
-        registryClusterFlowRuleProperty();
+        //loadClusterClientConfig();
+        //registryClusterFlowRuleProperty();
+        initDegradeRule();
     }
 
 
@@ -70,6 +75,22 @@ public class DataSourceInitFunc implements InitFunc {
         FlowRuleManager.register2Property(rds.getProperty());
     }
 
+    /**
+     * 初始化熔断规则
+     */
+    private void initDegradeRule(){
+        List<DegradeRule> rules = new ArrayList<>();
+        DegradeRule rule = new DegradeRule();
+        rule.setResource("com.princeli.sentinel.SentinelService");
+        //1s内处理5个请求
+        rule.setGrade(RuleConstant.DEGRADE_GRADE_RT);
+        //请求的平均响应时间（ms）
+        rule.setCount(10);
+        rule.setTimeWindow(5);//单位s
+        rules.add(rule);
+        DegradeRuleManager.loadRules(rules);
+
+    }
 
 
 
